@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>mvvm</title>
+</head>
+<body>
+  <!-- vue是MVVM
+  data-binding
+  template compile   -->
+  <!-- 支持对{{}}的解析，模板的编译 template compile
+  template -> html 
+  {{key}} data{name:'zk'，age:'18'} 回填
+  1 打坑 2 填值 -->
+  <div id="app">
+      <h3>姓名</h3>
+      <p>我的名字是{{name}}</p>
+      <h3>年龄</h3>
+      <p>{{age}}</p>
+      <div class="msg">
+          <p>
+              {{msg}}
+          </p>
+      </div>
+  </div>
+  <script>
+      class Vue{
+          constructor (opt){
+              this.opt = opt;
+              this.root = document.querySelector(opt.el);
+              this.compile(this.root)
+          }
+          compile(node){
+            //   {{.*}}
+            // 遍历结点 文本结点
+            [].forEach.call(node.childNodes,child =>{
+                // 只有{{}}才需要去做 ，正则 .匹配所有的字符 *匹配前面的子表达式任意次
+                //子节点下面还有没有孙节点 第一个子节点
+                // console.log(child.firstElementChild);
+                if(!child.firstElementChild && /\{\{(.*)(\})\}/.test(child.innerHTML)){
+                    let key = RegExp.$1.trim();
+                    child.innerHTML =child.innerHTML.replace(/\{\{(.*)(\})\}/,this.opt.data[key]);
+                    // child.innerHTML = this.opt.data[key]
+                    // console.log(RegExp.$1,RegExp.$2)
+                    // child.innerHTML = this.opt.data.name;
+                    // 递归 树状结构
+                }else if(child.firstElementChild){
+                    this.compile(child)
+                }
+                // console.log(child.innerHTML);
+            });
+          }
+      }
+      document.addEventListener('DOMContentLoaded',function(){
+        //快一点
+        let options ={
+            el:'#app',
+            data:{
+                name:'检索中...',
+                age:'18',
+                msg:'vue 高手，月薪五万'
+            }
+
+        }
+      new Vue(options)
+    });
+  </script>
+</body>
+</html>
